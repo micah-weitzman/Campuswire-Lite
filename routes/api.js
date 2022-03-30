@@ -5,7 +5,6 @@ const isAuthenticated = require('../middlewares/isAuthenticated')
 const router = express.Router()
 
 router.get('/questions', async (req, res) => {
-  const { body } = req
   try {
     const ans = await Question.find()
     res.json(ans)
@@ -19,9 +18,10 @@ router.post('/questions/add', isAuthenticated, async (req, res) => {
   const { questionText } = body
   const { username } = session
   try {
-    await Question.create({ questionText, author: username, answer: '' })
+    await Question.create({ questionText, author: username })
+    res.send('Question created')
   } catch (e) {
-    res.send('Error when creating question')
+    res.send(e)
   }
 })
 
@@ -32,7 +32,7 @@ router.post('/questions/answer', isAuthenticated, async (req, res) => {
     await Question.findByIdAndUpdate(_id, { answer })
     req.send('Successfully answered')
   } catch (e) {
-    res.send('Error when answering')
+    res.send(e)
   }
 })
 

@@ -17,7 +17,6 @@ mongoose.connect(MONGO_URI, {
 })
 
 app.use(express.static('dist'))
-
 app.use(express.json())
 
 app.use(cookieSession({
