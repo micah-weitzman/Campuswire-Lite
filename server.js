@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const cookieSession = require('cookie-session')
+const path = require('path')
 
 const accountRouter = require('./routes/account')
 const apiRouter = require('./routes/api')
@@ -27,13 +28,20 @@ app.use(cookieSession({
 app.use('/account', accountRouter)
 app.use('/api', apiRouter)
 
+app.use((err, req, res, next) => {
+  if (err) {
+    res.status(500)
+    return next(err)
+  }
+  return next()
+})
+
 app.get('/favicon.ico', (req, res) => {
   res.status(404).send()
 })
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../dist/index.html'))
-// })
 
-app.listen(port, () => {
-  console.log(`Listening on port: ${port}`)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'))
 })
+
+app.listen(port, () => {})

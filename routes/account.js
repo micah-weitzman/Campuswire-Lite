@@ -5,17 +5,17 @@ const isAuthenticated = require('../middlewares/isAuthenticated')
 
 const router = express.Router()
 
-router.post('/signup', async ({ body }, res) => {
+router.post('/signup', async ({ body }, res, next) => {
   const { username, password } = body
   try {
     await User.create({ username, password })
     res.send('User created')
   } catch (e) {
-    res.send('Error occured on creating new user')
+    next(e)
   }
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
   const { body } = req
   const { username, password } = body
   try {
@@ -25,16 +25,18 @@ router.post('/login', async (req, res) => {
         req.session.password = password
         res.send('logged in')
       } else {
-        res.send('not logged in')
+        next(Error('User not found'))
       }
     })
-  } catch {
-    res.send('Error occured when loggin in')
+  } catch (e) {
+    next(e)
   }
 })
 
 router.post('/logout', isAuthenticated, (req, res) => {
-  req.session = null
+  req.session.username = null
+  req.session.password = null
+  // res.session = null
   res.send('user logged out')
 })
 
