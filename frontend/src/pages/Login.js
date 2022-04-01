@@ -21,14 +21,14 @@ const Login = () => {
       await axios.post('/account/login', { username, password })
       navigate('/')
     } catch (e) {
-      console.log(e)
+      // console.log(e)
       setErrorText('User login failed')
       setError(true)
     }
   }
 
   const onFinishFailed = err => {
-    console.log(err)
+    // console.log(err)
   }
 
   return (

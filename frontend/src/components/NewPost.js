@@ -15,7 +15,7 @@ const NewPost = ({ visible, onCancel }) => {
       await axios.post('/api/questions/add', { questionText })
       onCancel()
     } catch (e) {
-      console.log(e)
+      // console.log(e)
     }
   }
 

@@ -67,7 +67,7 @@ const Home = () => {
       window.location.reload(false)
     } catch (e) {
       // todo: created alert if failed to answer
-      console.log(e)
+      // console.log(e)
     }
   }
 
