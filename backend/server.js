@@ -5,6 +5,7 @@ const path = require('path')
 
 const accountRouter = require('./routes/account')
 const apiRouter = require('./routes/api')
+const isAuthenticated = require('./middlewares/isAuthenticated')
 
 const app = express()
 
@@ -34,6 +35,11 @@ app.use((err, req, res, next) => {
     return next(err)
   }
   return next()
+})
+
+app.get('/isLoggedIn', isAuthenticated, ({ session }, res) => {
+  const { username } = session
+  res.json({ username })
 })
 
 app.get('/favicon.ico', (req, res) => {

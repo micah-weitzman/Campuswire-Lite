@@ -30,7 +30,7 @@ router.post('/questions/answer', isAuthenticated, async (req, res, next) => {
   const { _id, answer } = body
   try {
     await Question.findByIdAndUpdate(_id, { answer })
-    req.send('Successfully answered')
+    res.send('Successfully answered')
   } catch (e) {
     next(e)
   }
