@@ -29,14 +29,7 @@ const Home = () => {
   const [questionKey, setQuestionKey] = useState(NaN)
   const [visible, setVisible] = useState(false)
 
-  const onLogout = async () => {
-    try {
-      await axios.post('/account/logout')
-      setAuth(false)
-    } catch (e) {
-      // console.log(e)
-    }
-  }
+  const [form] = Form.useForm()
 
   const getQuestions = async () => {
     const qRes = await axios.get('/api/questions')
@@ -46,7 +39,7 @@ const Home = () => {
 
   useEffect(() => {
     setSelectedQuestion(questions[questionKey])
-  }, [questionKey])
+  }, [questionKey, questions])
 
   useEffect(async () => {
     try {
@@ -59,16 +52,35 @@ const Home = () => {
     await getQuestions()
   }, [])
 
+  useEffect(async () => {
+    const interval = setInterval(async () => {
+      await getQuestions()
+      // console.log(questionKey)
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const onLogout = async () => {
+    try {
+      await axios.post('/account/logout')
+      setAuth(false)
+    } catch (e) {
+      // console.log(e)
+    }
+  }
+
   const submitAnswer = async values => {
     const { answer } = values
     const { _id } = selectedQuestion
     try {
       await axios.post('/api/questions/answer', { _id, answer })
-      window.location.reload(false)
+      await getQuestions()
     } catch (e) {
       // todo: created alert if failed to answer
       // console.log(e)
     }
+    form.resetFields()
   }
 
   return (
@@ -81,8 +93,21 @@ const Home = () => {
             onSelect={({ key }) => setQuestionKey(parseInt(key, 10))}
             theme="dark"
             mode="inline"
-            style={{ height: '100%', borderRight: 0 }}
+            style={{
+              height: '100vh',
+              borderRight: 0,
+              position: 'fixed',
+              width: '200px',
+            }}
           >
+            <Menu.Item key="new-question-button">
+              {auth
+                ? (
+                  <Button onClick={() => setVisible(true)}>
+                    New Question
+                  </Button>
+                ) : <Link to="/login"><Button>Sign in to ask</Button></Link>}
+            </Menu.Item>
             {questions.map((q, index) => {
               const { _id, questionText, author } = q
               return (
@@ -91,23 +116,23 @@ const Home = () => {
                 </Menu.Item>
               )
             })}
-            {auth
-              ? (
-                <Button onClick={() => setVisible(true)}>
-                  New Question
-                </Button>
-              ) : <Link to="/login">Sign in to ask</Link>}
           </Menu>
           <NewPost
             visible={visible}
             onCancel={() => {
               setVisible(false)
-              window.location.reload(false)
+              // window.location.reload(false)
             }}
             key="newPost"
           />
         </Sider>
-        <Content style={{ padding: '0 24px', minHeight: 280 }}>
+        <Content
+          style={{
+            padding: 24,
+            margin: 0,
+            height: '100vh',
+          }}
+        >
           {selectedQuestion !== undefined
             ? (
               <>
@@ -119,13 +144,14 @@ const Home = () => {
                   <b>Question:</b> {selectedQuestion.questionText}
                 </Text>
                 <br />
-                { selectedQuestion.answer ? (
-                  <Text>
-                    <b>Answer:</b> {selectedQuestion.answer}
-                  </Text>
-                ) : auth
+                <Text>
+                  <b>Answer:</b> {selectedQuestion.answer ? selectedQuestion.answer : <Text type="danger">Question not yet answered</Text>}
+                </Text>
+                <br />
+                <br />
+                {auth
                   ? (
-                    <Form name="answer" onFinish={submitAnswer}>
+                    <Form form={form} name="answer" onFinish={submitAnswer}>
                       <Form.Item label="answer" name="answer" rules={[{ required: true }]}>
                         <Input />
                       </Form.Item>
@@ -134,7 +160,7 @@ const Home = () => {
                       </Button>
                     </Form>
                   ) : (
-                    <Text>
+                    <Text type="danger">
                       You must be logged in to answer a question
                     </Text>
                   ) }

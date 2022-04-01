@@ -17,18 +17,18 @@ const Navbar = ({ loggedIn, username, onLogout }) => {
 
   return (
     <Header>
-      <Row align="middle">
+      <Row justify="space-around" align="middle">
         <Col span={16}>
           <Title level={2}><p style={{ color: 'white' }}>Campuswire Lite</p></Title>
         </Col>
         { loggedIn
           ? (
             <>
-              <Col span={4}>
+              <Col span={6} align="right">
                 {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
                 <Text style={{ color: 'white' }}>Welcome <b>{username}</b></Text>
               </Col>
-              <Col span={4} align="right">
+              <Col span={2} align="right">
                 <Button onClick={onLogout}>
                   Logout
                 </Button>
